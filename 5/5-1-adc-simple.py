@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -35,10 +36,12 @@ def adc ():
     for number in range(MAX_VALUE):
         GPIO.output(DAC, dec2bin(number, RANK))
         
+        time.sleep(0.01)
+
         if GPIO.input(COMP) == 0:
             return number
 
-    return -1
+    return MAX_VALUE
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -46,8 +49,7 @@ try:
     while True:
         value = adc()
 
-        if value != 0 and value != -1:
-            print(value, round(MAX_VOLTAGE / MAX_VALUE * value, 2))
+        print(value, round(MAX_VOLTAGE / MAX_VALUE * value, 2))
 
 except KeyboardInterrupt:
     print("\nHave a good day!")
