@@ -7,6 +7,7 @@ import time
 
 DAC    = [26, 19, 13, 6,  5, 11, 9,  10]
 LEDS   = [21, 20, 16, 12, 7, 8,  25, 24]
+
 COMP   = 4
 TROYKA = 17
 
@@ -41,36 +42,23 @@ def dec2bin (value, rank):
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def adc (rank):
-    number = 0
+    left  = -1
+    right = MAX_VALUE + 1
 
-    for i in range(rank - 1, -1, -1):
-        number += 2 ** i
+    while True:
+        mid = int((left + right) / 2)
 
-        GPIO.output(DAC, dec2bin(number, rank))
-        time.sleep(0.01)
+        GPIO.output(DAC, dec2bin(mid, rank))
+
+        time.sleep(0.0005)
 
         if GPIO.input(COMP) == 0:
-            number -= 2 ** i
+            right = mid
+        else:
+            left  = mid
 
-    return number
-
-    # left  = -1
-    # right = MAX_VALUE + 1
-
-    # while True:
-    #     mid = int((left + right) / 2)
-
-    #     GPIO.output(DAC, dec2bin(mid, RANK))
-
-    #     time.sleep(0.005)
-
-    #     if GPIO.input(COMP) == 0:
-    #         right = mid
-    #     else:
-    #         left  = mid
-
-    #     if right - left <= 1:
-    #         return mid
+        if right - left <= 1:
+            return mid
 
 def vizualise (x, y, label, xlabel, ylabel):
     plt.plot(x, y, "-", label = label)
@@ -81,7 +69,7 @@ def vizualise (x, y, label, xlabel, ylabel):
     plt.grid(True)
     plt.legend()
 
-    plt.show()
+    plt.savefig(label + ".png")
 
     return
 
@@ -96,7 +84,7 @@ try:
     while current_voltage < MAX_VALUE * MAX_PERCENTAGE:
         current_voltage = adc(RANK)
         voltages.append(current_voltage)
-        time.sleep(0.05)
+
         GPIO.output(LEDS, dec2bin(current_voltage, RANK))
 
     GPIO.setup(TROYKA, GPIO.OUT, initial = GPIO.HIGH)
@@ -105,7 +93,7 @@ try:
     while current_voltage > MAX_VALUE * MIN_PERCENTAGE:
         current_voltage = adc(RANK)
         voltages.append(current_voltage)
-        time.sleep(0.05)
+
         GPIO.output(LEDS, dec2bin(current_voltage, RANK))
 
     current_time = time.time() - current_time
@@ -134,8 +122,8 @@ try:
     # Experiment parameters
     print("Experiment total time (sec):   ", current_time)
     print("Single measure time (sec):     ", current_time / len(voltages))
-    print("Discretization frequency (Hz): ", 1 / 0.05)
-    print("Quantization step (V):         ", MAX_VOLTAGE / MAX_VALUE)
+    print("Discretization frequency (Hz): ", 1 / 0.0005)
+    print("Quantization step (V):         ", MAX_VOLTAGE  / MAX_VALUE)
 
 except KeyboardInterrupt:
     print("\nHave a good day!")
