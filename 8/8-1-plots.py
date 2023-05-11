@@ -4,7 +4,7 @@ import matplotlib.ticker as tkr
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-XSPACE = 1
+XSPACE = 0
 YSPACE = 0.2
 
 STEP = 20
@@ -87,10 +87,10 @@ axis.text(7, 1.5, "Время разрядки: " + \
 
 # PLOT
 
-axis.plot(time, data, c = "blue", linewidth = 1, label = "$U(\\tau)$")
+axis.plot(time, data, 'o', ls = '-', markevery = 20, c = "blue", linewidth = 1, label = "$U(\\tau)$")
 
-axis.scatter(time[0:len(time):STEP], data[0:len(data):STEP], \
-             marker = "o", c = "blue", s = 15)
+# axis.scatter(time[0:len(time):STEP], data[0:len(data):STEP], \
+#              marker = "o", c = "blue", s = 15)
 
 axis.legend(shadow = False, loc = "best", fontsize = 20)
 
